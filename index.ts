@@ -94,18 +94,22 @@ lightContract.on(
         `${sentUnits.toFixed(3)} ${senderTokenInfo.symbol} -> ` +
           `${receivedUnits.toFixed(3)} ${
             signerTokenInfo.symbol
-          } ($${averageValue.toFixed(2)})`
+          } ($${utils.commify(averageValue.toFixed(2))})`
       );
     }
 
     if (shouldSendToDiscord(averageValue)) {
       sendSwapEmbed({
         timestamp: timestamp.toNumber() * 1000,
-        airswapFee: `$${feeValue.toFixed(2)}`,
+        airswapFee: `$${utils.commify(feeValue.toFixed(2))}`,
         makerAddress: signerWallet,
-        senderTokens: `${sentUnits.toFixed(2)} ${senderTokenInfo.symbol}`,
-        signerTokens: `${receivedUnits.toFixed(2)} ${signerTokenInfo.symbol}`,
-        usdValue: `$${averageValue.toFixed(2)}`,
+        senderTokens: `${utils.commify(sentUnits.toFixed(2))} ${
+          senderTokenInfo.symbol
+        }`,
+        signerTokens: `${utils.commify(receivedUnits.toFixed(2))} ${
+          signerTokenInfo.symbol
+        }`,
+        usdValue: `$${utils.commify(averageValue.toFixed(2))}`,
       });
     }
   }
