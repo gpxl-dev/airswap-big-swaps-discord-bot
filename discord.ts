@@ -8,7 +8,7 @@ let sendChannel: Discord.TextChannel | null = null;
 client.on("ready", () => {
   console.log("discord login");
   const channel = client.channels.cache.find(
-    (channel) => channel.id === "838897003366842431"
+    (channel) => channel.id === process.env.DISCORD_CHANNEL_ID
   );
   if (channel && channel.isText()) {
     console.log("discord channel ready");
