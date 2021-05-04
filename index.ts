@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import { ethers, Contract, BigNumber, utils } from "ethers";
+import { ethers, Contract, BigNumber, utils, Event } from "ethers";
 
 import lightContractAbi from "./lightContractAbi";
 import erc20Abi from "./erc20Abi";
@@ -45,7 +45,8 @@ lightContract.on(
     signerFee: BigNumber,
     senderWallet: string,
     senderToken: string,
-    senderAmount: BigNumber
+    senderAmount: BigNumber,
+    event: Event
   ) => {
     const senderTokenInfoPromise = getSymbolAndDecimalsForTokenFromAddress(
       senderToken
@@ -59,16 +60,19 @@ lightContract.on(
     const signerTokenPricePromise = getTokenPriceFromContractAddress(
       signerToken
     );
+    const transactionPromise = event.getTransaction();
     const [
       senderTokenInfo,
       signerTokenInfo,
       senderTokenPrice,
       signerTokenPrice,
+      transaction,
     ] = await Promise.all([
       senderTokenInfoPromise,
       signerTokenInfoPromise,
       senderTokenPricePromise,
       signerTokenPricePromise,
+      transactionPromise,
     ]);
 
     const sentUnits = parseFloat(
@@ -110,6 +114,7 @@ lightContract.on(
           signerTokenInfo.symbol
         }`,
         usdValue: `$${utils.commify(averageValue.toFixed(2))}`,
+        txHash: transaction.hash,
       });
     }
   }

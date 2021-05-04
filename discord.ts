@@ -1,4 +1,5 @@
 import Discord, { MessageEmbed } from "discord.js";
+import { truncateEthAddress } from "./formatting";
 
 const client = new Discord.Client();
 client.login(process.env.DISCORD_BOT_TOKEN);
@@ -28,6 +29,7 @@ const sendSwapEmbed: (details: {
   usdValue: string;
   airswapFee: string;
   makerAddress: string;
+  txHash: string;
 }) => void = ({
   timestamp,
   senderTokens,
@@ -35,10 +37,11 @@ const sendSwapEmbed: (details: {
   usdValue,
   airswapFee,
   makerAddress,
+  txHash,
 }) => {
   if (!sendChannel) return;
   const embed = new MessageEmbed()
-    .setDescription("🚀🚨 Big Swap Alert! 🚨🚀")
+    .setDescription("🚨🐳 Big Swap Alert! 🐳🚨")
     .setColor(2847231)
     .setTimestamp(timestamp)
     .addFields([
@@ -64,12 +67,17 @@ const sendSwapEmbed: (details: {
         value: airswapFee,
         inline: true,
       },
-    ])
-    .addFields([
       {
         name: "Maker address",
-        value: makerAddress,
-        inline: false,
+        value: `[${truncateEthAddress(
+          makerAddress
+        )}](https://etherscan.io/address/${makerAddress})`,
+        inline: true,
+      },
+      {
+        name: "Transaction",
+        value: `[View on Etherscan](https://etherscan.io/tx/${txHash})`,
+        inline: true,
       },
     ]);
   sendChannel.send(embed);
