@@ -12,6 +12,8 @@ Clone the repo and run `npm i`. You'll need node & npm installed.
 
 The bot needs a few environment variables to run:
 
+Create a `.env` file in the root directory with the following variables (fill them in!) or use whatever mechanism your server uses to populate them.
+
 ```env
 SWAP_CONTRACT_ADDRESS=
 INFURA_PROJECT_ID=
