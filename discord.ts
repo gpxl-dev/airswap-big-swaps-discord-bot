@@ -1,10 +1,10 @@
-import Discord, { MessageEmbed } from "discord.js";
+import { MessageEmbed, Client, TextChannel } from "discord.js";
 import { truncateEthAddress } from "./formatting";
 
-const client = new Discord.Client();
+const client = new Client();
 client.login(process.env.DISCORD_BOT_TOKEN);
 
-let sendChannel: Discord.TextChannel | null = null;
+let sendChannel: TextChannel | null = null;
 
 client.on("ready", () => {
   console.log("discord login");
@@ -13,7 +13,7 @@ client.on("ready", () => {
   );
   if (channel && channel.isText()) {
     console.log("discord channel ready");
-    sendChannel = channel as Discord.TextChannel;
+    sendChannel = channel as TextChannel;
   }
 });
 
