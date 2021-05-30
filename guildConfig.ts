@@ -5,7 +5,10 @@ import { readdir } from "fs/promises";
 import writeJsonFile from "write-json-file";
 
 const defaultConfigDir = "configs";
-const configDir = process.env.CONFIG_DIR || defaultConfigDir;
+const configDir = resolve(
+  __dirname,
+  process.env.CONFIG_DIR || defaultConfigDir
+);
 
 export interface SwapCriteria {
   upperThreshold: number | null;

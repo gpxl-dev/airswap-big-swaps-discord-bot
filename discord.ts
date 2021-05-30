@@ -5,6 +5,7 @@ import {
   GuildMemberManager,
 } from "discord.js";
 import makeDir from "make-dir";
+import { resolve } from "path";
 import { SwapDetails } from ".";
 import commands from "./commands";
 import { matchesCriteria } from "./criteraChecks";
@@ -30,7 +31,9 @@ export const init = async () => {
 };
 
 client.on("ready", async () => {
-  const dir = await makeDir(process.env.CONFIG_DIR || "config");
+  const dir = await makeDir(
+    resolve(__dirname, process.env.CONFIG_DIR || "config")
+  );
   console.log(`Configs dir: ${dir}`);
   console.log("discord login");
 });
