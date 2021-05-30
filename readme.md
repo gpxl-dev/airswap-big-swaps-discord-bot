@@ -17,15 +17,13 @@ Create a `.env` file in the root directory with the following variables (fill th
 ```env
 INFURA_PROJECT_ID=
 DISCORD_BOT_TOKEN=
-DISCORD_CHANNEL_ID=
-USD_SWAP_THRESHOLD=
+COMMAND_PREFIX=
 LOG_ALL_SWAPS=
 ```
 
 - `INFURA_PROJECT_ID` if you want to use your own API key for Infura. (I'm not sure if ethers will sometimes use other providers)
 - `DISCORD_BOT_TOKEN` bot token for discord
-- `DISCORD_CHANNEL_ID` the id of the channel to send the swap alerts to. You can get this by enabling developer mode in Discord's "advanced" user settings, then right clicking the desired channel and clicking "Copy Id".
-- `USD_SWAP_THRESHOLD` (default 500000) - only swaps above this threshold are sent to Discord
+- `COMMAND_PREFIX` prefix for bot commands (see below)
 - `LOG_ALL_SWAPS` - set to `true` if you want all swaps to be logged to your terminal/console (this **doesn't** send everything to discord)
 
 ### Adding the bot to your server
@@ -35,3 +33,26 @@ You need to generate an oAuth url with the `bot` scope and `Send Messages` text 
 ### Running the bot server
 
 The server is written in typescript, the easiest way to run it at the moment is to execute `npx ts-node index.ts`.
+
+### Commands
+
+This bot has several commands, in the format `[prefix] [command]`. Prefix is set by the environment variable `COMMAND_PREFIX` and should be something that wouldn't get typed in a normal conversation.
+
+Currently commands can only be executed by people with `ADMINISTRATOR` server permissions.
+
+The bot will respond to some commands with text, but in all cases will respond with one of the following reactions:
+
+- 👌 - command succeeded
+- ⚠️ - command failed
+- 🤷‍♀️ - unknown command
+
+> **_NOTE_: Commands change the config for the channel in which the command was issued only.**
+
+#### Available commands
+
+- `test` - checks if bot is listening to commands
+- `all` - report all swaps
+- `>x` - report all swaps with a value higher than `x` (x should be a number)
+- `<x` - report all swaps with a value less than `x`
+- `x - y` - report all swaps with a value between `x` and `y`
+- `stop` / `disable` / `off` - stop reporting swaps

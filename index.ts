@@ -9,22 +9,43 @@ import * as LightContract from "@airswap/light/build/contracts/Light.json";
 import * as lightDeploys from "@airswap/light/deploys.json";
 
 import getTokenPriceFromContractAddress from "./coingecko";
-import { sendMessage, sendSwapEmbed } from "./discord";
-import { shouldSendToDiscord } from "./filtering";
+import {
+  init,
+  sendIfMeetsCriteria,
+  sendMessage,
+  sendSwapEmbed,
+} from "./discord";
 
 const provider = ethers.getDefaultProvider("homestead", {
   infura: process.env.INFURA_PROJECT_ID,
 });
 
+if (!process.env.COMMAND_PREFIX) throw new Error("Command prefix not set.");
+
+export type SwapDetails = {
+  averageValue: number;
+  timestamp: number;
+  senderTokens: string;
+  signerTokens: string;
+  usdValue: string;
+  airswapFee: string;
+  makerAddress: string;
+  txHash: string;
+};
+
 const start = async () => {
   console.log("Starting big swap bot");
+  await init();
+  console.log("Configs loaded & discord ready");
+
+  const tokens = await fetchTokens(chainIds.MAINNET);
+  console.log("Token list fetched");
 
   const lightContract = new Contract(
     lightDeploys[1],
     LightContract.abi,
     provider
   );
-  const tokens = await fetchTokens(chainIds.MAINNET);
 
   lightContract.on(
     "Swap",
@@ -57,7 +78,7 @@ const start = async () => {
       );
 
       if (!senderTokenInfo || !signerTokenInfo) {
-        sendMessage(
+        console.log(
           `Observed swap for unsupported pair: ${senderToken} -> ${signerToken}`
         );
         return;
@@ -105,22 +126,23 @@ const start = async () => {
         );
       }
 
+      const swapDetails: SwapDetails = {
+        averageValue,
+        timestamp: timestamp.toNumber() * 1000,
+        airswapFee: `$${utils.commify(feeValue.toFixed(2))}`,
+        makerAddress: signerWallet,
+        senderTokens: `${utils.commify(sentUnits.toFixed(2))} ${
+          senderTokenInfo.symbol
+        }`,
+        signerTokens: `${utils.commify(receivedUnits.toFixed(2))} ${
+          signerTokenInfo.symbol
+        }`,
+        usdValue: `$${utils.commify(averageValue.toFixed(2))}`,
+        txHash: transaction.hash,
+      };
+
       // Check if parameters require discord message and send details if so.
-      if (shouldSendToDiscord(averageValue)) {
-        sendSwapEmbed({
-          timestamp: timestamp.toNumber() * 1000,
-          airswapFee: `$${utils.commify(feeValue.toFixed(2))}`,
-          makerAddress: signerWallet,
-          senderTokens: `${utils.commify(sentUnits.toFixed(2))} ${
-            senderTokenInfo.symbol
-          }`,
-          signerTokens: `${utils.commify(receivedUnits.toFixed(2))} ${
-            signerTokenInfo.symbol
-          }`,
-          usdValue: `$${utils.commify(averageValue.toFixed(2))}`,
-          txHash: transaction.hash,
-        });
-      }
+      sendIfMeetsCriteria(swapDetails);
     }
   );
 };
