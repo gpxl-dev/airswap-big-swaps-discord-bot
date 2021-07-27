@@ -161,26 +161,29 @@ const start = async () => {
     provider
   );
 
-  const handleTokenChange = (isRemove: boolean) => {
-    async (senderAddress: string, tokenAddresses: string[], event: Event) => {
-      const tokenSymbols = tokenAddresses.map((address) => {
-        const tokenInfo = tokens.find(
-          (token) => token.address === address.toLowerCase()
-        );
-        return (
-          tokenInfo?.symbol || `[???]((https://etherscan.io/address/${address})`
-        );
-      });
-      const tx = await event.getTransaction();
-      sendAddTokensEmbed(
-        {
-          makerAddress: senderAddress,
-          tokenSymbols,
-          txHash: tx.hash,
-        },
-        isRemove
+  const handleTokenChange = async (
+    isRemove: boolean,
+    senderAddress: string,
+    tokenAddresses: string[],
+    event: Event
+  ) => {
+    const tokenSymbols = tokenAddresses.map((address) => {
+      const tokenInfo = tokens.find(
+        (token) => token.address === address.toLowerCase()
       );
-    };
+      return (
+        tokenInfo?.symbol || `[???]((https://etherscan.io/address/${address})`
+      );
+    });
+    const tx = await event.getTransaction();
+    sendAddTokensEmbed(
+      {
+        makerAddress: senderAddress,
+        tokenSymbols,
+        txHash: tx.hash,
+      },
+      isRemove
+    );
   };
 
   registryContract.on("AddTokens", handleTokenChange.bind(null, false));
