@@ -32,7 +32,7 @@ You need to generate an oAuth url with the `bot` scope and `Send Messages` text 
 
 ### Running the bot server
 
-The server is written in typescript, the easiest way to run it at the moment is to execute `npx ts-node index.ts`.
+The server is written in typescript, the easiest way to run it at the moment is to execute `npx ts-node --files index.ts`.
 
 ### Commands
 
@@ -56,3 +56,5 @@ The bot will respond to some commands with text, but in all cases will respond w
 - `<x` - report all swaps with a value less than `x`
 - `x - y` - report all swaps with a value between `x` and `y`
 - `stop` / `disable` / `off` - stop reporting swaps
+- `registry on` - report registry events
+- `registry off` - stop registry events

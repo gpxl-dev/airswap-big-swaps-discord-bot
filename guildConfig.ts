@@ -22,7 +22,8 @@ export interface GuildConfig {
   channelConfigs: {
     [channelId: string]: {
       swapTitle: string;
-      swapCriteria: SwapCriteria;
+      swapCriteria: SwapCriteria | false;
+      registry: boolean;
     };
   };
 }

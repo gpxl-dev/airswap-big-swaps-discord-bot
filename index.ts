@@ -6,11 +6,14 @@ import { ethers, Contract, BigNumber, utils, Event } from "ethers";
 import { fetchTokens } from "@airswap/metadata";
 import { chainIds } from "@airswap/constants";
 import * as LightContract from "@airswap/light/build/contracts/Light.json";
-import * as lightDeploys from "@airswap/light/deploys.json";
+import lightDeploys from "@airswap/light/deploys";
+import * as RegistryContract from "@airswap/registry/build/contracts/Registry.sol/Registry.json";
+import registryDeploys from "@airswap/registry/deploys";
 
 import getTokenPriceFromContractAddress from "./coingecko";
 import {
   init,
+  sendAddTokensEmbed,
   sendIfMeetsCriteria,
   sendMessage,
   sendSwapEmbed,
@@ -30,6 +33,12 @@ export type SwapDetails = {
   usdValue: string;
   airswapFee: string;
   makerAddress: string;
+  txHash: string;
+};
+
+export type AddTokensDetails = {
+  makerAddress: string;
+  tokenSymbols: string[];
   txHash: string;
 };
 
@@ -145,6 +154,37 @@ const start = async () => {
       sendIfMeetsCriteria(swapDetails);
     }
   );
+
+  const registryContract = new Contract(
+    registryDeploys[1],
+    RegistryContract.abi,
+    provider
+  );
+
+  const handleTokenChange = (isRemove: boolean) => {
+    async (senderAddress: string, tokenAddresses: string[], event: Event) => {
+      const tokenSymbols = tokenAddresses.map((address) => {
+        const tokenInfo = tokens.find(
+          (token) => token.address === address.toLowerCase()
+        );
+        return (
+          tokenInfo?.symbol || `[???]((https://etherscan.io/address/${address})`
+        );
+      });
+      const tx = await event.getTransaction();
+      sendAddTokensEmbed(
+        {
+          makerAddress: senderAddress,
+          tokenSymbols,
+          txHash: tx.hash,
+        },
+        isRemove
+      );
+    };
+  };
+
+  registryContract.on("AddTokens", handleTokenChange.bind(null, false));
+  registryContract.on("RemoveTokens", handleTokenChange.bind(null, true));
 };
 
 start();

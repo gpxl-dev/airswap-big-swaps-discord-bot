@@ -6,7 +6,7 @@ import {
 } from "discord.js";
 import makeDir from "make-dir";
 import { resolve } from "path";
-import { SwapDetails } from ".";
+import { SwapDetails, AddTokensDetails } from ".";
 import commands from "./commands";
 import { matchesCriteria } from "./criteraChecks";
 import { truncateEthAddress } from "./formatting";
@@ -90,7 +90,10 @@ export const sendIfMeetsCriteria = (details: SwapDetails) => {
   Object.values(configs).forEach((config) => {
     Object.keys(config.channelConfigs).forEach(async (channelId) => {
       const channelConfig = config.channelConfigs[channelId];
-      if (matchesCriteria(details, channelConfig.swapCriteria)) {
+      if (
+        channelConfig.swapCriteria &&
+        matchesCriteria(details, channelConfig.swapCriteria)
+      ) {
         const configChannel = await client.channels.fetch(channelId);
         if (configChannel && configChannel.isText()) {
           sendSwapEmbed(
@@ -169,6 +172,49 @@ const sendSwapEmbed: (
   channel.send(embed);
 };
 
-// TODO: ! command to add current channel to broadcast list (server owner only)
+export const sendAddTokensEmbed: (
+  details: AddTokensDetails,
+  isRemove: boolean
+) => void = ({ makerAddress, tokenSymbols, txHash }, isRemove) => {
+  const embed = new MessageEmbed()
+    .setDescription(
+      isRemove
+        ? "A maker has revoked support for some tokens"
+        : "A maker has indicated support for new tokens"
+    )
+    .setColor(2847231)
+    .addFields([
+      {
+        name: isRemove ? "Tokens removed" : "Tokens added",
+        value: tokenSymbols.join(", "),
+        inline: true,
+      },
+      {
+        name: "Maker address",
+        value: `[${truncateEthAddress(
+          makerAddress
+        )}](https://etherscan.io/address/${makerAddress})`,
+        inline: true,
+      },
+      {
+        name: "Transaction",
+        value: `[View on Etherscan](https://etherscan.io/tx/${txHash})`,
+        inline: true,
+      },
+    ]);
+  sendToRegistryEnabledChannels(embed);
+};
+
+const sendToRegistryEnabledChannels = (embed: MessageEmbed) => {
+  Object.values(configs).forEach((config) => {
+    Object.keys(config.channelConfigs).forEach(async (channelId) => {
+      const channelConfig = config.channelConfigs[channelId];
+      if (channelConfig.registry) {
+        const configChannel = await client.channels.fetch(channelId);
+        (configChannel as TextChannel).send(embed);
+      }
+    });
+  });
+};
 
 export { sendMessage, sendSwapEmbed };

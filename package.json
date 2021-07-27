@@ -12,7 +12,7 @@
   "dependencies": {
     "@airswap/constants": "^0.4.0",
     "@airswap/metadata": "^0.3.2",
-    "@airswap/protocols": "^0.5.5",
+    "@airswap/protocols": "^0.5.7",
     "axios": "^0.21.1",
     "discord.js": "^12.5.3",
     "dotenv": "^8.2.0",
@@ -20,11 +20,15 @@
     "load-json-file": "^6.2.0",
     "lodash.kebabcase": "^4.1.1",
     "make-dir": "^3.1.0",
+    "truncate-eth-address": "^1.0.1",
     "write-json-file": "^4.3.0"
   },
   "devDependencies": {
     "@types/lodash.kebabcase": "^4.1.6",
     "@types/node": "^15.0.1",
     "typescript": "^4.2.4"
+  },
+  "volta": {
+    "node": "16.5.0"
   }
 }
