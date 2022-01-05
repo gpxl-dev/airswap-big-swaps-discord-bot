@@ -19,9 +19,10 @@ import {
   sendSwapEmbed,
 } from "./discord";
 
-const provider = ethers.getDefaultProvider("homestead", {
-  infura: process.env.INFURA_PROJECT_ID,
-});
+const provider = ethers.providers.InfuraProvider.getWebSocketProvider(
+  "homestead",
+  process.env.INFURA_PROJECT_ID
+);
 
 if (!process.env.COMMAND_PREFIX) throw new Error("Command prefix not set.");
 
