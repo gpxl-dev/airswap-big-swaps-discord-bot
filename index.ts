@@ -48,7 +48,7 @@ const start = async () => {
   await init();
   console.log("Configs loaded & discord ready");
 
-  const tokens = await fetchTokens(chainIds.MAINNET);
+  const { tokens } = await fetchTokens(chainIds.MAINNET);
   console.log("Token list fetched");
 
   const lightContract = new Contract(

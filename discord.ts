@@ -74,7 +74,7 @@ client.on("message", async (message) => {
         if (response?.length) {
           message.reply(response);
         }
-      } catch (e) {
+      } catch (e: any) {
         message.react("⚠️");
         console.log("command failed: " + e.message);
       }
