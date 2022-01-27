@@ -200,7 +200,7 @@ const start = async () => {
   };
 
   check(onSwap);
-  setInterval(check, 3 * 60 * 1000);
+  setInterval(check.bind(null, onSwap), 3 * 60 * 1000);
 
   // const registryContract = new Contract(
   //   registryDeploys[1],
