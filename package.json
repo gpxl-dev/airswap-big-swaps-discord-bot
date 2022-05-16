@@ -10,9 +10,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@airswap/constants": "^0.4.0",
-    "@airswap/metadata": "^1.0.5",
-    "@airswap/protocols": "^0.5.7",
+    "@airswap/constants": "^3.0.1",
+    "@airswap/metadata": "^3.0.2",
+    "@airswap/protocols": "^2.0.0",
     "axios": "^0.21.1",
     "discord.js": "^12.5.3",
     "dotenv": "^8.2.0",

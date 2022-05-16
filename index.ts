@@ -109,17 +109,19 @@ const start = async () => {
       [senderTokenPricePromise, signerTokenPricePromise, transactionPromise]
     );
 
+    if (senderTokenPrice == null && signerTokenPrice == null) return;
+
     // Stats about sent tokens
     const sentUnits = parseFloat(
       utils.formatUnits(senderAmount, senderTokenInfo.decimals)
     );
-    const sentValue = sentUnits * senderTokenPrice;
+    const sentValue = senderTokenPrice && sentUnits * senderTokenPrice;
 
     // Stats about received tokens.
     const receivedUnits = parseFloat(
       utils.formatUnits(signerAmount, signerTokenInfo.decimals)
     );
-    const receivedValue = receivedUnits * signerTokenPrice;
+    const receivedValue = signerTokenPrice && receivedUnits * signerTokenPrice;
 
     // Fee is in basis points (0.01%, which is 1/10000)
     const fee = signerAmount
@@ -129,10 +131,19 @@ const start = async () => {
       utils.formatUnits(fee, signerTokenInfo.decimals)
     );
 
-    const feeValue = feeUnits * signerTokenPrice;
+    // If we're here one of these won't be null.
+    const feeValue = feeUnits * (signerTokenPrice! || senderTokenPrice!);
 
-    // Calculate average usd value of sent and received tokens.
-    const averageValue = (sentValue + receivedValue) / 2;
+    let averageValue;
+    if (!!sentValue && !!receivedValue) {
+      // Calculate average usd value of sent and received tokens.
+      averageValue = (sentValue + receivedValue) / 2;
+    } else if (!!sentValue) {
+      averageValue = sentValue;
+    } else {
+      // This will not be null because we would have returned above.
+      averageValue = receivedValue!
+    }
 
     // Log swaps for debug purposes
     if (process.env.LOG_ALL_SWAPS === "true") {
@@ -185,7 +196,7 @@ const start = async () => {
         fromBlock,
         toBlock
       );
-      events.forEach((e) => {
+      events.forEach((e:any) => {
         try {
           onSwap(e);
         } catch (error: any) {
